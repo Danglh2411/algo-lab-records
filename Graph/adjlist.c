@@ -23,6 +23,10 @@ int _index(adjacencyList A[], int node) {
     }
 }
 
+void BFS(adjacencyList A[], int node) {
+    
+}
+
 int main(int argc, char const *argv[])
 {
     int n;  // Number of nodes in the graph
