@@ -80,6 +80,7 @@ int main(int argc, char const *argv[])
         if (node1==0 || node2==0) {break;}
         else
             addEdge(G, node1, node2);
+            addEdge(G, node2, node2);
     }
 
     printGraph(G);
