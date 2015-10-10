@@ -2,104 +2,137 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define NIL 0
 
 // Stack implementation
 struct stack {
     int data[100];
-    int top=-1;
+    int top;
 };
 
-struct stack S;
-
-void push(int data) {
-	S.top = S.top + 1;
-	S.data[S.top] = data;
+void push(struct stack* S, int data) {
+	S->top = S->top + 1;
+	S->data[S->top] = data;
 }
 
-int pop() {
-	S.top = S.top - 1;
-	return S.data[S.top + 1];
+int pop(struct stack* S) {
+	S->top = S->top - 1;
+	return S->data[S->top + 1];
 }
 
-int top() {
-    return S.data[S.top];
+int top(struct stack* S) {
+    return S->data[S->top];
 }
 
-int is_empty() {
-	if (S.top < 0) {return 1;}
+int is_empty(struct stack* S) {
+	if (S->top < 0) {return 1;}
 	else return 0;
 }
 
-// Adjacency list implementation
-typedef struct adjacencyList {
+// Elements of the Adjacency List
+struct listNode {
     int node;
-    struct adjacencyList *ptr;
-    struct adjacencyList *parent;
-	int visited;
-	int DFN;
-} adjacencyList;
+    struct listNode *next;
+};
+
+// Elements of the array having pointers to the list
+struct listArray {
+    struct listNode *next;
+    int visited;
+    int DFN;
+    int p;
+};
+
+// The array representing the Graph
+struct Graph {
+    int V;
+    struct listArray *arr;
+};
+
+// Function to return a new node for the Adjacency List
+struct listNode* newListNode(int node) {
+    struct listNode* newListNode;
+    newListNode = (struct listNode*)malloc(sizeof(struct listNode));
+    newListNode->node = node;
+
+    return newListNode;
+}
+
+// Function to add an edge between two nodes
+void addEdge(struct Graph* G, int node1, int node2) {
+    struct listNode* newNode = newListNode(node2);
+    newNode->next = (G->arr)[node1].next;
+    (G->arr)[node1].next = newNode;
+}
+
+// Function to print the Adjacency List of the Graph
+void printGraph(struct Graph* G) {
+    struct listNode* iter;
+    printf("\n");
+    for (int i = 1; i <= G->V; ++i) {
+        printf("Node = %d, Parent = %d, DFN = %d, Visited = %d \n", i, G->arr[i].p, G->arr[i].DFN, G->arr[i].visited);
+    }
+}
 
 int main () {
-    int n;  // Number of nodes in the graph
+    int V;  // The number of nodes
     printf("Enter the number of nodes : \n");
-    scanf("%d", &n);    
+    scanf("%d", &V);
 
-    adjacencyList *adjl;  // Adjacency array of the nodes
-    adjl = (adjacencyList *)malloc(n*sizeof(adjacencyList));  // Allocate the space for the base array
-
-    // Feed the nodes
-    for (int i = 0; i < n; ++i) {
-        adjl[i].node = i;
+    // Create a Graph G
+    struct Graph* G;
+    G = (struct Graph*)malloc(sizeof(struct Graph));
+    G->V = V;
+    // Here the node at index i will have the value i. So, the zeroth index is left empty.
+    G->arr = (struct listArray *)malloc((V+1)*sizeof(struct listArray));
+    for (int i=1; i<=V; i++) {
+        G->arr[i].next = NULL;
     }
-	printf("Graph with %d nodes, values starting from 0 has been created.\n\n", n);
 
-    // Extend the elements of the base array of the adjacency list
-    for (int i = 0; i < n; ++i) {
-        printf("Enter the nodes connected to %d (Enter -1 to stop)\n", adjl[i].node);
-        int nbr;
-        adjacencyList *iter;
-        iter = &adjl[i];
-        for(;;) {
-            scanf("%d", &nbr);
-            if (nbr==-1) {break;}
-            else
-                iter->ptr = (adjacencyList *)malloc(sizeof(adjacencyList));
-                iter->ptr->node = nbr;
-                iter = iter->ptr;
-                iter->ptr = NULL;
-        }
-    }  // Graph is now created as the Adjacency lists
+    printf("Enter pair of nodes to add Edge :\n");
+    printf("(Enter (0, 0) to terminate)\n");
+    int node1, node2;
+    while(true) {
+        scanf("%d %d", &node1, &node2);
+        if (node1==0 || node2==0) {break;}
+        else
+            addEdge(G, node1, node2);
+            addEdge(G, node2, node2);
+    }
+
+    struct stack* S;
+    S = (struct stack *)malloc(sizeof(struct stack));
+    S->top = -1;
 
     // Traversal
     int count;
-    for (int i=0; i<n; i++) {
-        adjl[i].DFN = 0;
-        adjl[i].visited = 0;
-        adjl[i].parent = NULL;
+    for (int i = 1; i <= G->V; i++) {
+        G->arr[i].DFN = 0;
+        G->arr[i].visited = 0;
+        G->arr[i].p = NIL;
     }
 
     count = 1;
-    push(0);
-    adjl[0].visited = 1;
-    adjl[0].DFN = count++;
-    adjl[0].parent = &adjl[0];
+    push(S, 1);
+    G->arr[1].visited = 1;
+    G->arr[1].DFN = count++;
+    G->arr[1].p = NIL;
 
     int x, y;
-    adjacencyList *iter;
-    while(!is_empty()) {
-        x = top();
-        iter = &adjl[x];
-        while((iter->ptr)!=NULL) {
-            iter = iter->ptr;
-            if (iter->visited==0) {
-                iter->DFN = count++;
-                iter->visited = 1;
-                iter->parent = &adjl[x];
-                push(iter->node);
+    struct listNode *iter;
+    while(!is_empty(S)) {
+        x = pop(S);
+        iter = G->arr[x].next;
+        while(iter!=NULL) {
+            if (G->arr[iter->node].visited==0) {
+                G->arr[iter->node].DFN = count++;
+                G->arr[iter->node].visited = 1;
+                G->arr[iter->node].p = x;
+                push(S, iter->node);
             }
+            iter = iter->next;
         }
-        pop();
     }
 
-
+    printGraph(G);
 }
