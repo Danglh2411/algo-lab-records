@@ -140,6 +140,10 @@ void BFS(struct Graph *G, int s) {
         }
         G->arr[u].color = BLACK;
     }
+
+    if (cycle_detected == NO)
+        printf("The Graph is acyclic\n");
+
 }
 
 int main(int argc, char const *argv[])

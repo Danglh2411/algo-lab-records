@@ -8,7 +8,6 @@
 #define GRAY 1
 #define BLACK 2
 
-#define NIL 0
 #define INFINITE INT_MAX 
 
 #define MAX_SIZE 100
@@ -81,34 +80,6 @@ int edge_weight(struct Graph* G, int u, int v) {
     }
 }
 
-// A Queue data structure
-struct Queue {
-    int arr[MAX_SIZE];
-    int length;
-    int head;
-    int tail;
-};
-
-void ENQUEUE(struct Queue* Q, int s) {
-    Q->arr[Q->tail] = s;
-    if (Q->tail==Q->length) {
-        Q->tail = 0;
-    }
-    else
-        ++(Q->tail);
-}
-
-int DEQUEUE(struct Queue* Q) {
-    int to_return;
-    to_return = Q->arr[Q->head];
-    if (Q->head==Q->length) {
-        Q->head = 0;
-    }
-    else
-        ++(Q->head);
-    return to_return;
-}
-
 void dijkstra(struct Graph *G, int s) {
     // Set configurations of all the nodes
     for (int i = 1; i <= G->V; ++i) {
@@ -120,7 +91,7 @@ void dijkstra(struct Graph *G, int s) {
     G->arr[s].color = GRAY;
     G->arr[s].weight = 0;
 
-    // Create empty Queue
+    // Do the iteration
     int u, v;
     struct listNode* iter;
     for (u=1; u<=G->V; ++u) {
