@@ -4,18 +4,6 @@
 #include "stdlib.h"
 #include "stdbool.h"
 
-// A Queue data structure
-struct Queue {
-    int data;
-    struct Queue *next;
-    struct Queue *back;
-};
-
-struct QueueHandlers {
-    struct Queue *first;
-    struct Queue *last;
-};
-
 // Function to remove an element from Queue and return the node
 int DEQUEUE(struct QueueHandlers *QH) {
     int to_return;
