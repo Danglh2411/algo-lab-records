@@ -85,7 +85,7 @@ void dijkstra(struct Graph *G, int s) {
         for (i=1; i<=G->V; i++) {
             if (G->adjMatrix[i][j]==0) {continue;} // Not j's neighbors
             else {
-                if (G->colorArray[i]!=BLACK) { // Not j's parent
+           //     if (G->colorArray[i]!=BLACK) { // Not j's parent
                     if (G->costArray[i]==INFINITE) { // New node
                         G->costArray[i] = G->costArray[j] + G->adjMatrix[i][j];
                         G->parentArray[i] = j;
@@ -95,7 +95,7 @@ void dijkstra(struct Graph *G, int s) {
                         G->parentArray[i] = j;
                     }
                     ENQUEUE(Q, i);
-                }
+             //   }
             }
         }
     }
